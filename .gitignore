@@ -1,0 +1,14 @@
+.vscode/
+.idea/
+*.exe
+.idea
+*.tds
+*.~*
+*.dcu
+__history/
+__recovery/
+*.local
+*.identcache
+*.stat
+*.vlb
+*.rsm
