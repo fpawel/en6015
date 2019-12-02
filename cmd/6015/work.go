@@ -51,8 +51,6 @@ var (
 	}
 )
 
-
-
 func readerDak() modbus.ResponseReader {
 	return comportDak.NewResponseReader(context.Background(), comm.Config{
 		TimeoutEndResponse: 30 * time.Millisecond,
@@ -70,7 +68,7 @@ func perform() error {
 	if err := comportDak.SetConfig(comport.Config{
 		Baud:        9600,
 		ReadTimeout: time.Millisecond,
-		Name:iniStr(ComportDakKey),
+		Name:        iniStr(ComportDakKey),
 	}); err != nil {
 		return err
 	}
@@ -126,7 +124,10 @@ func testIndicationBoard(var3V, var5V modbus.Var) error {
 		return err
 	}
 
-	for _, currOut := range []float64{4, 12, 22} {
+	for _, c := range [][3]float64{{4, 373, 443}, {12, 1189, 1259}, {22, 2209, 2279}} {
+		currOut := c[0]
+		uMin := c[1]
+		uMax := c[2]
 
 		addNewWorkLog(fmt.Sprintf("токовый выход %v мА", currOut), "")
 		if err := dakWrite32(83, currOut); err != nil {
@@ -136,9 +137,7 @@ func testIndicationBoard(var3V, var5V modbus.Var) error {
 		infof("установка токового выхода %v мА, 5 c", currOut)
 		time.Sleep(5 * time.Second)
 
-		u := currOut * 100
-
-		if err := checkValue3(105, 12, u*0.98, u*1.02); err != nil {
+		if err := checkValue3(105, 12, uMin, uMax); err != nil {
 			return err
 		}
 
